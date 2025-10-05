@@ -1,0 +1,10 @@
+Django==5.1.3
+django-axes==8.0.0
+django-brutebuster==0.1.8
+django-brutebuster2==0.2.0
+django-cors-headers==4.3.0
+django-csp==4.0
+django-extensions==3.2.3
+django-simple-history==3.7.0
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1

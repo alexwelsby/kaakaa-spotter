@@ -107,19 +107,16 @@ def add_to_library(upload_url, mask_urls):
     
 
 def detect_kaakaa(img_path):
-    from ultralytics import YOLO
     import cv2
 
     print(img_path)
-
-    MODEL_PATH = "C:/Users/alexw/Assignments/AIML339/Project/instance_segmentation/BEST_MODEL_YOLO/best-kaakaa-yolo11n-seg.pt" 
-    model = YOLO(MODEL_PATH)
 
     TARGET_CLASSES = [80] #this is the kaakaa class
 
     original = cv2.imread(str(img_path))
     h, w, _ = original.shape
 
+    model = settings.YOLO_MODEL
     results = model.predict(source=img_path, save=True, save_txt=False, stream=True)
 
     # Prepare empty masks
@@ -143,20 +140,36 @@ def detect_kaakaa(img_path):
     #making a new image for each mask
     mask_urls = []
     for mask in full_masks:
+        print("non-zeroes: ", cv2.countNonZero(mask))
+        print("length of mask: ", len(mask))
+        print("shape of mask: ", mask.shape)
+        print("mask.dtype: ", mask.dtype) 
         if cv2.countNonZero(mask) == 0:
             print(f"No objects found in {img_path}, skipping.")
             return
 
         # Apply mask to original image
+        print(f"mask: {mask}")
         masked_image = cv2.bitwise_and(original, original, mask=mask)
 
         #getting ROI bounding box
         y_indices, x_indices = np.where(mask > 0)
         x_min, x_max = np.min(x_indices), np.max(x_indices)
         y_min, y_max = np.min(y_indices), np.max(y_indices)
+        #clamping...
+        x_min = max(0, x_min-10)
+        y_min = max(0, y_min-10)
+        x_max = min(w, x_max+10)
+        y_max = min(h, y_max+10)
+
+        h, w = masked_image.shape[:2]
+        print("Image size:", h, w)
+        print("BBox:", x_min, x_max, y_min, y_max)
 
         # cropping to ROI
-        cropped_image = masked_image[y_min-10:y_max+10, x_min-10:x_max+10]
+        print(f"masked_image: {masked_image}")
+        cropped_image = masked_image[y_min:y_max, x_min:x_max]
+        print(f"cropped_image: {cropped_image}")
 
         #converting to jpg w cv2 and contentfile (this is so we can use filesystemstorage...)
         success, buffer = cv2.imencode(".jpg", cropped_image)

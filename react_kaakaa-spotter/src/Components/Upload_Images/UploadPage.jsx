@@ -6,7 +6,6 @@ function Upload_Images() {
   return (
     <div className={styles.whole}>
       <UploadSection></UploadSection>
-      <ViewSection></ViewSection>
     </div>
   );
 }

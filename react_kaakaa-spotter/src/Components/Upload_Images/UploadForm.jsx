@@ -2,6 +2,7 @@ import styles from "./uploadpage.module.css";
 import React, { useState, useEffect } from "react";
 
 function UploadForm() {
+  const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
   const [maskUrls, setMaskUrls] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,10 +24,9 @@ function UploadForm() {
   const handleFile = (event) => {
     const files = Array.from(event.target.files);
 
-    console.log(files);
-
+    const url = URL.createObjectURL(files[0]);
+    setPreview(url);
     setFile(files[0]);
-    console.log(file);
   };
 
   const handleSubmit = async (event) => {
@@ -34,13 +34,13 @@ function UploadForm() {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("label", bands);
+    console.log(formData);
     try {
       const res = await fetch("http://127.0.0.1:8000/api/upload/", {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-      console.log(data);
       setMaskUrls(data["mask_urls"]);
       setIsLoading(false);
     } catch (error) {
@@ -50,43 +50,57 @@ function UploadForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="file"
-        accept="image/*"
-        id="file-input"
-        name="filename"
-        onChange={handleFile}
-      />
-      <input type="submit" />
-      <label for="toggle_label">Do you know the bands for this bird?:</label>
-      <input
-        type="checkbox"
-        name="toggle_label"
-        onChange={handle_labelCheckbox}
-      />
-      {checked ? (
-        <>
-          <label for="b_label">Band code:</label>
+      <div className={styles.container}>
+        <label className={styles.customUpload}>
+          {preview ? (
+            <img src={preview} alt="Preview" />
+          ) : (
+            <>
+              <div style={styles.icon}>☁️</div>
+              <div style={styles.labelText}>Upload an image</div>
+            </>
+          )}
           <input
-            type="text"
-            id="b_label"
-            name="b_label"
-            onChange={handleText}
+            type="file"
+            accept="image/*"
+            id="file-input"
+            name="filename"
+            onChange={handleFile}
           />
-        </>
-      ) : (
-        <></>
-      )}{" "}
-      {isLoading ? (
-        <></>
-      ) : (
-        <>
-          {maskUrls.map((url, i) => (
-            <img key={i} src={url} alt={`mask-${i}`} />
-          ))}
-        </>
-      )}
-      <img className={styles.previewImg} />
+        </label>
+        <div className={styles.BandCheck}>
+          <label for="toggle_label">Do you know the bands for this bird?</label>
+          <input
+            type="checkbox"
+            name="toggle_label"
+            onChange={handle_labelCheckbox}
+          />
+          {checked ? (
+            <>
+              <label for="b_label">Band code:</label>
+              <input
+                type="text"
+                id="b_label"
+                name="b_label"
+                onChange={handleText}
+              />
+            </>
+          ) : (
+            <></>
+          )}{" "}
+        </div>
+        {isLoading ? (
+          <></>
+        ) : (
+          <>
+            {maskUrls.map((url, i) => (
+              <img key={i} src={url} alt={`mask-${i}`} />
+            ))}
+          </>
+        )}
+        <img className={styles.previewImg} />
+        <input type="submit" />
+      </div>
     </form>
   );
 }
