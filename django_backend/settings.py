@@ -48,14 +48,6 @@ CNN_MODEL = load_model(cnn_path)
 DINO_MODEL = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14",pretrained=True)
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 
-def get_dino_faiss():
-    from django_backend import FAISS_helper
-    return FAISS_helper.load_faiss_index("media/FAISS/DINOv2/vector.index")
-
-def get_cnn_faiss():
-    from django_backend import FAISS_helper
-    return FAISS_helper.load_faiss_index("media/FAISS/CNN/vector.index")
-
 # Application definition
 
 INSTALLED_APPS = [

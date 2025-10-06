@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from django.core.files.storage import FileSystemStorage
 from django.core.files.base import ContentFile
 from django.conf import settings
+from django_backend import FAISS_helper
 import numpy as np
 import os
 import time
@@ -72,6 +73,43 @@ def create_library():
 
     return file_path
 
+def search_for_image(request):
+    DINO_FAISS = FAISS_helper.DINO_FAISS
+    DINO_PATHS = FAISS_helper.DINO_PATHS
+
+    image_file = request.FILES.get("image")
+
+    if not image_file:
+        return JsonResponse({"error": "No image provided"}, status=400)
+    
+    sanitized = image_file.name.replace(" ", "_")
+    
+    fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT,  "uploads"),
+                            base_url=os.path.join(settings.MEDIA_URL,  "uploads"))
+    filename = fs.save(sanitized, image_file)
+    file_url = fs.url(filename)
+    print(file_url)
+
+    file_path = os.path.join(settings.MEDIA_ROOT, "uploads", filename)
+
+    mask_urls = detect_kaakaa(file_path)
+
+    url = request.build_absolute_uri(file_url)
+
+    absolute_uris = []
+    for mask_url in mask_urls:
+        absolute_uris.append(request.build_absolute_uri(mask_url))
+
+    data = {}
+    if len(mask_urls) > 0:
+        library_entry = add_to_library(url, absolute_uris)
+
+        data = FAISS_helper.majority_voting_cosine("http://127.0.0.1:8000/media/FAISS/DINOv2/vector.index", DINO_PATHS, library_entry, 5)
+
+    return JsonResponse(data)
+
+    
+
 def get_library_path():
     filename = "image_library"
     json_dir = os.path.join(settings.MEDIA_ROOT, "json")
@@ -104,6 +142,7 @@ def add_to_library(upload_url, mask_urls):
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
+    return d
     
 
 def detect_kaakaa(img_path):

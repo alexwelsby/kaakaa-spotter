@@ -21,6 +21,10 @@ def load_faiss_index(index_path):
     print(f"Index loaded from {index_path}")
     return index, image_paths
 
+DINO_FAISS, DINO_PATHS = load_faiss_index("media/FAISS/DINOv2/vector.index")
+
+#CNN_FAISS, CNN_PATHS = load_faiss_index("media/FAISS/CNN/vector.index")
+
 #assumes we're passed a train, val, or test set, and that all images are within class folders
 def generate_dict_from_set(embeddings: Optional[List] = None, path_to_dataset = None):
   index = 0 if embeddings is None else int(embeddings[-1]['id']) + 1
