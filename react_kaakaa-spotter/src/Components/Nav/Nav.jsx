@@ -11,6 +11,7 @@ function Nav() {
         <Link to="/app">Dashboard</Link>
         <Link to="/app/stats">Statistics</Link>
         <Link to="/app/upload">Upload images</Link>
+        <Link to="/app/search">Search via image</Link>
       </div>
     </nav>
   );

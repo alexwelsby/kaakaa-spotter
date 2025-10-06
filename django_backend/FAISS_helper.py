@@ -111,12 +111,13 @@ def majority_voting_cosine(faiss_index_path, embeddings, search_image, k):
             normalize_L2(query_vector)
             query_vectors.append(query_vector)
     if model == "DINO":
-        for mask_path in mask_paths:
-            vectors = DINO_MODEL(DINO_helper.load_image(mask_path).to(DEVICE))
-            query_vector = vectors[0].cpu().numpy()
-            query_vector = np.array(query_vector).reshape(1, -1)
-            normalize_L2(query_vector)
-            query_vectors.append(query_vector)
+        with torch.no_grad():
+            for mask_path in mask_paths:
+                vectors = DINO_MODEL(DINO_helper.load_image(mask_path).to(DEVICE))
+                query_vector = vectors[0].cpu().numpy()
+                query_vector = np.array(query_vector).reshape(1, -1)
+                normalize_L2(query_vector)
+                query_vectors.append(query_vector)
 
     #our vector needs to be normalized to search via cosine simiarity
     
@@ -138,5 +139,8 @@ def majority_voting_cosine(faiss_index_path, embeddings, search_image, k):
 
             majority_vote = Counter(all_guesses)
             winner = sorted(all_guesses, key=lambda x: majority_vote[x], reverse=True)[0]
+            new_bird_bool = bool(majority_vote[winner] <= k/2 or statistics.median(neighbor_distances) < 0.8) #have to cast to bool or we can't serialize it via json
 
-        winners.append({ "winner": winner, "count": majority_vote[winner], "new_bird_flag":majority_vote[winner] <= k/2 or statistics.median(neighbor_distances) < 0.8})
+        winners.append({ "winner": winner, "count": majority_vote[winner], "new_bird_flag":new_bird_bool})
+
+    return winners

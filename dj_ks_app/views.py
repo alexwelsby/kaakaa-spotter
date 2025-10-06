@@ -51,7 +51,6 @@ def upload_image(request):
         "mask_urls": absolute_uris,
     })
 
-@api_view(["GET"])
 @renderer_classes([JSONRenderer])
 def get_image_library(request):
     file_path = get_library_path()
@@ -73,8 +72,9 @@ def create_library():
 
     return file_path
 
+@api_view(["POST"])
+@renderer_classes([JSONRenderer])
 def search_for_image(request):
-    DINO_FAISS = FAISS_helper.DINO_FAISS
     DINO_PATHS = FAISS_helper.DINO_PATHS
 
     image_file = request.FILES.get("image")
@@ -104,9 +104,13 @@ def search_for_image(request):
     if len(mask_urls) > 0:
         library_entry = add_to_library(url, absolute_uris)
 
-        data = FAISS_helper.majority_voting_cosine("http://127.0.0.1:8000/media/FAISS/DINOv2/vector.index", DINO_PATHS, library_entry, 5)
-
-    return JsonResponse(data)
+        data = FAISS_helper.majority_voting_cosine("media/FAISS/DINOv2/vector.index", DINO_PATHS, library_entry, 5)
+    else:
+        return JsonResponse({
+        "success": 0 if len(mask_urls) == 0 else 1,
+    })
+    print("data ", data)
+    return JsonResponse(data, safe=False)
 
     
 
