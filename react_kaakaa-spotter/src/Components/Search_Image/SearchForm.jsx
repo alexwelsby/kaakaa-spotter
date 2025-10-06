@@ -1,7 +1,7 @@
-import styles from "./uploadpage.module.css";
+import styles from "../Upload_Images/uploadpage.module.css";
 import React, { useState, useEffect } from "react";
 
-function UploadForm() {
+function SearchForm() {
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
   const [maskUrls, setMaskUrls] = useState([]);
@@ -34,24 +34,14 @@ function UploadForm() {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("label", bands);
-    const path = window.location.pathname;
-    const api_path = path.endsWith("/search")
-      ? "http://127.0.0.1:8000/api/search/"
-      : path.endsWith("/upload")
-      ? "http://127.0.0.1:8000/api/upload/"
-      : "";
-    console.log(path);
     console.log(formData);
     try {
-      const res = await fetch(api_path, {
+      const res = await fetch("http://127.0.0.1:8000/api/search/", {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-      console.log(data)
-      if (path.endsWith("/upload")) {
-        setMaskUrls(data["mask_urls"]);
-      }
+      setMaskUrls(data["mask_urls"]);
       setIsLoading(false);
     } catch (error) {
       console.error("Failed to send/fetch to upload api ", error);
@@ -99,7 +89,7 @@ function UploadForm() {
             <></>
           )}{" "}
         </div>
-        {isLoading || maskUrls === undefined ? (
+        {isLoading ? (
           <></>
         ) : (
           <>
@@ -115,4 +105,4 @@ function UploadForm() {
   );
 }
 
-export default UploadForm;
+export default SearchForm;

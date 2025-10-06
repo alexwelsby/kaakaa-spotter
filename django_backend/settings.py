@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+from ultralytics import YOLO
+import torch
+from keras.models import Sequential, load_model, Model
 import os
 
 load_dotenv() #getting our .env secrets
@@ -30,6 +33,20 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
+#loading our models...
+#YOLO
+yolo_path =  os.getenv("YOLO_MODEL_PATH")
+YOLO_MODEL = YOLO(yolo_path)
+
+
+#best performing CNN (benchmark VGG-19 fine-tuned on Dataset B)
+cnn_path = os.getenv("CNN_MODEL_PATH")
+CNN_MODEL = load_model(cnn_path)
+
+#our ViT-S DINOv2, ImageNet weights are default
+DINO_MODEL = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14",pretrained=True)
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 
 # Application definition
 

@@ -12,6 +12,21 @@
   );
 }
 
+/* because html doesn't let you style file inputs yourself... gotta hide it */
+input[type="file"] {
+  display: none;
+}
+
+input[type="button"],
+input[type="submit"] {
+  padding: 5px;
+  border-radius: 0px;
+  background-color: #1d8f03;
+  border: 0px;
+  color: white;
+  cursor: pointer;
+}
+
 main {
   filter: drop-shadow(3px 3px 3px #0000000d);
 }

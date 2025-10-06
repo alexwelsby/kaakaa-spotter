@@ -7,6 +7,8 @@ import Nav from "./Components/Nav/Nav.jsx";
 import Upload_Images from "./Components/Upload_Images/UploadPage.jsx";
 import Dashboard from "./Components/Dashboard/Dashboard.jsx";
 import Stats from "./Components/Stats/Stats.jsx";
+import SearchForm from "./Components/Search_Image/SearchForm.jsx";
+import UploadForm from "./Components/Upload_Images/UploadForm.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -16,7 +18,8 @@ function App() {
       <Nav></Nav>
       <Routes>
         <Route path="app/" element={<Dashboard />} />
-        <Route path="app/upload" element={<Upload_Images />} />
+        <Route path="app/upload" element={<Upload_Images ></Upload_Images>} />
+        <Route path="app/search" element={<Upload_Images ></Upload_Images>} />
         <Route path="app/stats" element={<Stats />} />
       </Routes>
     </BrowserRouter>
