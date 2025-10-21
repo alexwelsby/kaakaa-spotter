@@ -5,6 +5,7 @@ function UploadForm() {
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
   const [maskUrls, setMaskUrls] = useState([]);
+  const [GetData, setGetData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [checked, setChecked] = useState(false);
   const [bands, setBands] = useState("");
@@ -48,10 +49,12 @@ function UploadForm() {
         body: formData,
       });
       const data = await res.json();
-      console.log(data)
       if (path.endsWith("/upload")) {
         setMaskUrls(data["mask_urls"]);
       }
+      setGetData(data);
+      console.log("data ", data); //this is a mess but it's fine.
+      console.log("maskUrls ", maskUrls);
       setIsLoading(false);
     } catch (error) {
       console.error("Failed to send/fetch to upload api ", error);
@@ -99,8 +102,27 @@ function UploadForm() {
             <></>
           )}{" "}
         </div>
-        {isLoading || maskUrls === undefined ? (
-          <></>
+        {isLoading ? (
+          <p></p>
+        ) : maskUrls === undefined || maskUrls.length == 0 ? (
+          GetData === undefined ? (
+            <p>Loading bird prediction...</p>
+          ) : GetData[0]["new_bird_flag"] == false ? (
+            <p>
+              I think this bird may be {GetData[0]["winner"]}!{" "}
+              {GetData[0]["count"]} of the image vector's nearest neighbors had
+              this label. The median distance of its k-neighbors was greater
+              than 0.8 using cosine similarity, suggesting this image represents
+              a known bird.
+            </p>
+          ) : (
+            <p>
+              I think this may be a new bird... {GetData[0]["count"]} of the
+              image vector's nearest neighbors had the label{" "}
+              {GetData[0]["winner"]}. The median distance of its k-neighbors was
+              greater than 0.8, suggesting this is a bird I haven't seen before.
+            </p>
+          )
         ) : (
           <>
             {maskUrls.map((url, i) => (
