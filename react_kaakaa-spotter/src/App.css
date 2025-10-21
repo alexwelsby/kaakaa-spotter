@@ -57,27 +57,32 @@ input:focus {
 }
 
 a {
-  color: var(--dsa-red);
+  color: var(--dark-green);
 }
 
 button {
   font-weight: 600 !important;
   border-width: 2px;
-  border-radius: 4px;
+  border-radius: 4px 4px 0px 0px;
   line-height: 1;
   padding: 0.75rem 0.75rem 0.625rem;
   cursor: pointer;
   color: white;
   transition: 0.15s;
+  border-color: var(--dark-green);
+  background-color: var(--dark-green);
 }
 
-.redButton {
-  border-color: var(--dsa-red);
-  background-color: var(--dsa-red);
+button.active {
+  background-color: var(--light-green);
+  color: var(--dark-green);
 }
 
-.redButton:hover {
-  background-color: #9f0005;
+.greenButton {
+}
+
+button:hover {
+  background-color: var(--hunter-green);
 }
 
 .whiteButton {

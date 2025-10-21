@@ -3,6 +3,7 @@ asgiref==3.9.2
 astunparse==1.6.3
 certifi==2025.10.5
 charset-normalizer==3.4.3
+colorama==0.4.6
 contourpy==1.3.2
 cycler==0.12.1
 Django==5.1.3
@@ -16,6 +17,7 @@ django-simple-history==3.7.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
 dotenv==0.9.9
+faiss-cpu==1.12.0
 filelock==3.19.1
 flatbuffers==25.9.23
 fonttools==4.60.1
@@ -24,6 +26,7 @@ gast==0.6.0
 google-pasta==0.2.0
 grpcio==1.75.1
 h5py==3.14.0
+huggingface-hub==0.35.3
 idna==3.10
 Jinja2==3.1.6
 keras==3.11.3
@@ -55,8 +58,10 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 pytz==2025.2
 PyYAML==6.0.3
+regex==2025.9.18
 requests==2.32.5
 rich==14.1.0
+safetensors==0.6.2
 scipy==1.15.3
 six==1.17.0
 sqlparse==0.5.3
@@ -65,8 +70,11 @@ tensorboard==2.20.0
 tensorboard-data-server==0.7.2
 tensorflow==2.20.0
 termcolor==3.1.0
+tokenizers==0.22.1
 torch==2.8.0
 torchvision==0.23.0
+tqdm==4.67.1
+transformers==4.57.0
 typing_extensions==4.15.0
 tzdata==2025.2
 ultralytics==8.3.204

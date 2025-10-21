@@ -112,8 +112,6 @@ def search_for_image(request):
     print("data ", data)
     return JsonResponse(data, safe=False)
 
-    
-
 def get_library_path():
     filename = "image_library"
     json_dir = os.path.join(settings.MEDIA_ROOT, "json")
@@ -129,7 +127,8 @@ def get_library(file_path):
                     pass #will just return data = []
             except json.JSONDecodeError:
                 pass #will just return data = []
-    return list(reversed(data))
+    sorted_data = sorted(data, key=lambda x: x.get('date', 0))
+    return list(reversed(sorted_data))
 
 def add_to_library(upload_url, mask_urls):
     #seconds elapsed since 1970... we'll use this to decide when to cull images later
