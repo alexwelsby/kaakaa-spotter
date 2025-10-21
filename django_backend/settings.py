@@ -43,6 +43,9 @@ YOLO_MODEL = YOLO(yolo_path)
 #best performing CNN (benchmark VGG-19 fine-tuned on Dataset B)
 cnn_path = os.getenv("CNN_MODEL_PATH")
 CNN_MODEL = load_model(cnn_path)
+x = CNN_MODEL.layers[-2].output
+CNN_MODEL = Model(inputs = CNN_MODEL.input, outputs = x)
+CNN_MODEL.trainable = False
 
 #our ViT-S DINOv2, ImageNet weights are default
 DINO_MODEL = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14",pretrained=True)

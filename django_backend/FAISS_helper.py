@@ -23,7 +23,7 @@ def load_faiss_index(index_path):
 
 DINO_FAISS, DINO_PATHS = load_faiss_index("media/FAISS/DINOv2/vector.index")
 
-#CNN_FAISS, CNN_PATHS = load_faiss_index("media/FAISS/CNN/vector.index")
+CNN_FAISS, CNN_PATHS = load_faiss_index("media/FAISS/CNN/vector.index")
 
 #assumes we're passed a train, val, or test set, and that all images are within class folders
 def generate_dict_from_set(embeddings: Optional[List] = None, path_to_dataset = None):
@@ -94,20 +94,26 @@ def add_to_index(output_path: str, bulk_embeddings: Optional[List] = None):
     return faiss_index
 
 #we can now try to predict....
-def majority_voting_cosine(faiss_index_path, embeddings, search_image, k):
+def majority_voting_cosine(model_info, search_image):
     query_vectors = []
     all_guesses = []
     winners = []
 
+    model = model_info["model"]
+    print("model is ", model)
+    k_nn = model_info["k_nn"]
     mask_paths = search_image['masks']
-    faiss_index = faiss.read_index(faiss_index_path)
 
-    #matters bc each model outputs vectors of different shapes, so they need to have separate indices
-    model = "CNN" if "CNN" in faiss_index_path else "DINO" if "DINO" in faiss_index_path else None
+    faiss_index_path = "media/FAISS/DINOv2/vector.index" if model == "DINO" else "media/FAISS/CNN/vector.index"
+    print("index path is ", faiss_index_path)
+    embeddings = DINO_PATHS if model == "DINO" else CNN_PATHS
+
+    faiss_index = faiss.read_index(faiss_index_path)
   
     if model == "CNN":
         for mask_path in mask_paths:
             query_vector=CNN_MODEL.predict(CNN_helper.load_image(mask_path), verbose=0)
+            print(query_vector.shape)
             normalize_L2(query_vector)
             query_vectors.append(query_vector)
     if model == "DINO":
@@ -116,13 +122,11 @@ def majority_voting_cosine(faiss_index_path, embeddings, search_image, k):
                 vectors = DINO_MODEL(DINO_helper.load_image(mask_path).to(DEVICE))
                 query_vector = vectors[0].cpu().numpy()
                 query_vector = np.array(query_vector).reshape(1, -1)
-                normalize_L2(query_vector)
+                normalize_L2(query_vector) #our vector needs to be normalized to search via cosine simiarity
                 query_vectors.append(query_vector)
 
-    #our vector needs to be normalized to search via cosine simiarity
-    
     for query_vector in query_vectors:
-        distances, indices = faiss_index.search(query_vector, k)
+        distances, indices = faiss_index.search(query_vector, k_nn)
 
         neighbor_distances = []
 
@@ -130,7 +134,6 @@ def majority_voting_cosine(faiss_index_path, embeddings, search_image, k):
             distance = distances[0][i]
 
             #kind of a mess. dealing with the json dictionary
-            id = embeddings[index]['id']
             new_label = embeddings[index]['label']
 
             all_guesses.append(new_label)
@@ -139,8 +142,8 @@ def majority_voting_cosine(faiss_index_path, embeddings, search_image, k):
 
             majority_vote = Counter(all_guesses)
             winner = sorted(all_guesses, key=lambda x: majority_vote[x], reverse=True)[0]
-            new_bird_bool = bool(majority_vote[winner] <= k/2 or statistics.median(neighbor_distances) < 0.8) #have to cast to bool or we can't serialize it via json
+            new_bird_bool = bool(majority_vote[winner] <= k_nn/2 or statistics.median(neighbor_distances) < 0.8) #have to cast to bool or we can't serialize it via json
 
         winners.append({ "winner": winner, "count": majority_vote[winner], "new_bird_flag":new_bird_bool})
-
+    print(winners)
     return winners

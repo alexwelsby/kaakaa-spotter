@@ -8,9 +8,22 @@ function SearchForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [checked, setChecked] = useState(false);
   const [bands, setBands] = useState("");
+  const [GetData, setGetData] = useState(null);
+  const [kNNValue, setKNNValue] = useState(5);
+  const [modelValue, setModelValue] = useState("DINO");
+
+  console.log("CAN ANYONE HEAR ME");
 
   const handleText = (event) => {
-    setMessage(event.target.value);
+    setBands(event.target.value);
+  };
+
+  const handleKNNChange = (event) => {
+    setKNNValue(parseInt(event.target.value));
+  };
+
+  const handleModelChange = (event) => {
+    setModelValue(event.target.value);
   };
 
   const handle_labelCheckbox = (event) => {
@@ -34,6 +47,9 @@ function SearchForm() {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("label", bands);
+    formData.append("model", modelValue);
+    formData.append("k_nn", kNNValue);
+    console.log("model is stored as ", modelValue);
     console.log(formData);
     try {
       const res = await fetch("http://127.0.0.1:8000/api/search/", {
@@ -41,7 +57,8 @@ function SearchForm() {
         body: formData,
       });
       const data = await res.json();
-      setMaskUrls(data["mask_urls"]);
+      setGetData(data);
+      console.log("GetData", GetData);
       setIsLoading(false);
     } catch (error) {
       console.error("Failed to send/fetch to upload api ", error);
@@ -89,14 +106,68 @@ function SearchForm() {
             <></>
           )}{" "}
         </div>
+        <div>
+          <label>Which model would you like to test?: </label>
+          <select
+            name="model"
+            id="model"
+            value={modelValue}
+            onChange={handleModelChange}
+          >
+            <option value="DINO">DINOv2</option>
+            <option value="CNN">CNN</option>
+          </select>
+        </div>
+        <div>
+          <label>K-NN for image search: </label>
+          <select
+            name="k-nn"
+            id="k-nn"
+            value={kNNValue}
+            onChange={handleKNNChange}
+          >
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="7">7</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="15">15</option>
+            <option value="18">18</option>
+            <option value="24">24</option>
+            <option value="42">42</option>
+          </select>
+        </div>
         {isLoading ? (
-          <></>
+          <p></p>
+        ) : maskUrls === undefined || maskUrls.length == 0 ? (
+          GetData === undefined ? (
+            <p>Loading bird prediction...</p>
+          ) : GetData["success"] === 0 ? (
+            <p>
+              Oops! The YOLO model can't see a kaakaa in your image. Are you
+              sure this is an image of a kaakaa?
+            </p>
+          ) : GetData[0]["new_bird_flag"] == false ? (
+            <p>
+              I think this bird may be {GetData[0]["winner"]}!{" "}
+              {GetData[0]["count"]} of the image vector's nearest neighbors had
+              this label. The median distance of its k-neighbors was greater
+              than 0.8 using cosine similarity, suggesting this image represents
+              a known bird.
+            </p>
+          ) : (
+            <p>
+              I think this may be a new bird... {GetData[0]["count"]} of the
+              image vector's nearest neighbors had the label{" "}
+              {GetData[0]["winner"]}. The median distance of its k-neighbors was
+              greater than 0.8, suggesting this is a bird I haven't seen before.
+            </p>
+          )
         ) : (
-          <>
-            {maskUrls.map((url, i) => (
-              <img key={i} src={url} alt={`mask-${i}`} />
-            ))}
-          </>
+          <></>
         )}
         <img className={styles.previewImg} />
         <input type="submit" />

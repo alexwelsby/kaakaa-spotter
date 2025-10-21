@@ -11,7 +11,7 @@ function UploadForm() {
   const [bands, setBands] = useState("");
 
   const handleText = (event) => {
-    setMessage(event.target.value);
+    setBands(event.target.value);
   };
 
   const handle_labelCheckbox = (event) => {
