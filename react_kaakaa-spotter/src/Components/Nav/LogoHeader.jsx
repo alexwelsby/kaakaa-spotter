@@ -1,15 +1,14 @@
 //import styles from "./logoHeader.module.css";
-import headerLogo from "../../assets/react.svg";
+import headerLogo from "../../assets/react.png";
 import styles from "./nav.module.css";
 export default function LogoHeader() {
   return (
     <header className={styles.logoHeader}>
       <img src={headerLogo} />
       <h2>
-        DSA <br />
-        Membership
+        Kākā
         <br />
-        Visualizer
+        Spotter
       </h2>
     </header>
   );

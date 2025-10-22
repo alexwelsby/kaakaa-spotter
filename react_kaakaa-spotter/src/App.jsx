@@ -12,7 +12,7 @@ import UploadForm from "./Components/Upload_Images/UploadForm.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
-
+  console.log("Can literally any change be seen at all")
   return (
     <BrowserRouter>
       <Nav></Nav>

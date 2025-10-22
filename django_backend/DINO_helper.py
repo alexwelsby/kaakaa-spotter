@@ -2,8 +2,9 @@ import numpy as np
 import torch
 import torchvision.transforms as T
 from PIL import Image
-import requests
 from io import BytesIO
+import requests
+
 from transformers import AutoImageProcessor
 from typing import Optional, List
 

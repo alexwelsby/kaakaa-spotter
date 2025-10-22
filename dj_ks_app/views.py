@@ -78,6 +78,10 @@ def search_for_image(request):
     DINO_PATHS = FAISS_helper.DINO_PATHS
 
     image_file = request.FILES.get("image")
+    model = request.POST.get("model")
+    k_nn = int(request.POST.get("k_nn"))
+
+    model_info = { "model": model, "k_nn": k_nn }
 
     if not image_file:
         return JsonResponse({"error": "No image provided"}, status=400)
@@ -104,7 +108,7 @@ def search_for_image(request):
     if len(mask_urls) > 0:
         library_entry = add_to_library(url, absolute_uris)
 
-        data = FAISS_helper.majority_voting_cosine("media/FAISS/DINOv2/vector.index", DINO_PATHS, library_entry, 5)
+        data = FAISS_helper.majority_voting_cosine(model_info, library_entry)
     else:
         return JsonResponse({
         "success": 0 if len(mask_urls) == 0 else 1,
