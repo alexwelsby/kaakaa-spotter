@@ -140,35 +140,38 @@ function SearchForm() {
             <option value="42">42</option>
           </select>
         </div>
-        {isLoading ? (
-          <p></p>
-        ) : maskUrls === undefined || maskUrls.length == 0 ? (
-          GetData === undefined ? (
-            <p>Loading bird prediction...</p>
-          ) : GetData["success"] === 0 ? (
-            <p>
-              Oops! The YOLO model can't see a kaakaa in your image. Are you
-              sure this is an image of a kaakaa?
-            </p>
-          ) : GetData[0]["new_bird_flag"] == false ? (
-            <p>
-              I think this bird may be {GetData[0]["winner"]}!{" "}
-              {GetData[0]["count"]} of the image vector's nearest neighbors had
-              this label. The median distance of its k-neighbors was greater
-              than 0.8 using cosine similarity, suggesting this image represents
-              a known bird.
-            </p>
+        <div className={styles.predictionBox}>
+          {isLoading ? (
+            <p></p>
+          ) : maskUrls === undefined || maskUrls.length == 0 ? (
+            GetData === undefined ? (
+              <p>Loading bird prediction...</p>
+            ) : GetData["success"] === 0 ? (
+              <p>
+                Oops! The YOLO model can't see a kaakaa in your image. Are you
+                sure this is an image of a kaakaa?
+              </p>
+            ) : GetData[0]["new_bird_flag"] == false ? (
+              <p>
+                I think this bird may be {GetData[0]["winner"]}!{" "}
+                {GetData[0]["count"]} of the image vector's nearest neighbors
+                had this label. The median distance of its k-neighbors was
+                greater than 0.8 using cosine similarity, suggesting this image
+                represents a known bird.
+              </p>
+            ) : (
+              <p>
+                I think this may be a new bird... {GetData[0]["count"]} of the
+                image vector's nearest neighbors had the label{" "}
+                {GetData[0]["winner"]}. The median distance of its k-neighbors
+                was greater than 0.8, suggesting this is a bird I haven't seen
+                before.
+              </p>
+            )
           ) : (
-            <p>
-              I think this may be a new bird... {GetData[0]["count"]} of the
-              image vector's nearest neighbors had the label{" "}
-              {GetData[0]["winner"]}. The median distance of its k-neighbors was
-              greater than 0.8, suggesting this is a bird I haven't seen before.
-            </p>
-          )
-        ) : (
-          <></>
-        )}
+            <></>
+          )}
+        </div>
         <img className={styles.previewImg} />
         <input type="submit" />
       </div>
